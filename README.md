@@ -21,7 +21,7 @@ This setup allows you to specify how many instances you want and uses Ansible to
 3. Have Ansible (tested on 2.7.5)
 4. Git clone this repo
 ```
-git clone <will come in here later>
+git clone https://github.com/carroarmato0/vagrant-gateways.git
 ```
 5. (Optional) Customize how many instances you want by editing the Vagrantfile
 ```
