@@ -1,0 +1,3 @@
+[submodule "ansible/roles/dhcp"]
+	path = ansible/roles/dhcp
+	url = https://github.com/bertvv/ansible-role-dhcp.git
