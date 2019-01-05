@@ -1,0 +1,43 @@
+---
+- name: Enable IPv4 forwarding
+  sysctl:
+      name: net.ipv4.ip_forward
+      value: 1
+      sysctl_set: yes
+      state: present
+      reload: yes
+
+- name: Create Iptables NAT chain
+  iptables:
+    table: nat
+    chain: POSTROUTING
+    out_interface: 'eth0'
+    source: "{{ ansible_eth1.ipv4.network }}/{{ ( ansible_eth1.ipv4.network + '/' + ansible_eth1.ipv4.netmask) | ipaddr('prefix') }}"
+    jump: MASQUERADE
+    comment: Ansible NAT Masquerade
+
+- name: Manage DHCP
+  include_role:
+    name: dhcp
+  vars:
+    dhcp_global_authoritative: authoritative
+    dhcp_global_routers: "{{ ansible_eth1.ipv4.address }}"
+    dhcp_global_domain_name_servers: "{{ domain_name_servers }}"
+    dhcp_subnets:
+      - ip: "{{ ansible_eth1.ipv4.network }}"
+        netmask: "{{ ansible_eth1.ipv4.netmask }}"
+        range_begin: "{{ ansible_eth1.ipv4.network | regex_replace('.0$', '.10') }}"
+        range_end: "{{ ansible_eth1.ipv4.network | regex_replace('.0$', '.254') }}"
+
+- name: Install EPEL Repo
+  yum:
+    name: epel-release
+    state: present
+
+- name: Install some extra packages
+  yum:
+    name: "{{packages}}"
+  vars:
+    packages:
+    - htop
+    - iftop
